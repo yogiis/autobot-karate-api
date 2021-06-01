@@ -29,21 +29,20 @@ Feature: CRUD
       | yogi     | owner       |
       | tasya    | supervisor  |
 
-  Scenario: List User
+  Scenario: List User & Single User
     Given path '/api/users'
     And param page = 2
     When method GET
     Then status 200
     And print 'response---', response
     And match each response.data contains {"id": '#number', "email": '#string', "first_name": '#string', "last_name": '#string', "avatar": '#string'}
+    * def id = response.data[0].id
 
-  Scenario: Single User
-    Given path '/api/users/2'
+    Given path '/api/users/' + id
     And method GET
     Then status 200
     And print 'response---', response
     And assert SchemaUtils.isValid(response, schemaSingleUser)
-    And assert responseTime < 1000
 
   Scenario: Update
     * set payload.job = jobUtil
@@ -60,6 +59,7 @@ Feature: CRUD
     When method DELETE
     Then status 204
     And print 'response---', response
+    And assert responseTime < 1000
 
 
 
